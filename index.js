@@ -18,13 +18,16 @@ app.set("views",path.join(__dirname,"views"));
 app.use(express.static(path.join(__dirname,"public")));
 
 let posts = [
-    { username: "abc", 
+    { id:"1a",
+      username: "abc", 
       content: "This is the content of the first post." 
     },
-    { username: "def",
+    { id:"2b",
+      username: "def",
       content: "This is the content of the second post." 
     },
-    { username: "ghi",
+    { id:"3c",
+      username: "ghi",
       content: "This is the content of the third post." 
     }
 ];
@@ -42,6 +45,7 @@ app.get('/posts',(req,res)=>{
     console.log('Request received');
     res.render("index.ejs", { posts: posts });
 });
+
 app.get('/posts/new',(req,res)=>{
     
     res.render("new.ejs", { posts: posts });
@@ -50,6 +54,12 @@ app.post('/posts',(req,res)=>{
     let {username, content} = req.body;
     posts.push({ username: username, content: content });
     res.redirect('/posts');
+});
+app.get('/posts/:id',(req,res)=>{
+   let {id} = req.params;
+   let post=posts.find((post) => post.id === id);
+   console.log(post);
+   res.send("working");
 });
 
 app.listen(port,()=>{
