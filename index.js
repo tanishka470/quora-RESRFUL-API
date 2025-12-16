@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import methodOverride from 'method-override';
 import { v4 as uuidv4 } from 'uuid';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -12,6 +13,7 @@ const port=8080;
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());
+app.use(methodOverride('_method'));
 
 
 app.set("view engine","ejs");
@@ -63,6 +65,48 @@ app.get('/posts/:id',(req,res)=>{
    let post=posts.find((post) => post.id === id);
    console.log(post);
    res.render("show.ejs",{post});
+});
+
+// Edit form
+app.get('/posts/:id/edit',(req,res)=>{
+  let { id } = req.params;
+  let post = posts.find(p => p.id === id);
+  if(!post){
+    return res.status(404).send('Post not found');
+  }
+  res.render('edit.ejs', { post });
+});
+
+// Update (PUT/PATCH)
+app.patch('/posts/:id',(req,res)=>{
+  let { id } = req.params;
+  let { username, content } = req.body;
+  let idx = posts.findIndex(p => p.id === id);
+  if(idx === -1){
+    return res.status(404).send('Post not found');
+  }
+  if (username !== undefined) posts[idx].username = username;
+  if (content !== undefined) posts[idx].content = content;
+  res.redirect('/posts/' + id);
+});
+
+// Destroy (DELETE)
+app.delete('/posts/:id',(req,res)=>{
+  let { id } = req.params;
+  let before = posts.length;
+  posts = posts.filter(p => p.id !== id);
+  if(posts.length === before){
+    return res.status(404).send('Post not found');
+  }
+  res.redirect('/posts');
+});
+app.patch('/posts/:id',(req,res)=>{
+  let {id} = req.params;
+  let newcontent = req.body.content;
+  let post=posts.find((post) => post.id === id);
+  post.content=newcontent;
+  console.log(post);
+  res.send("Update post");
 });
 
 app.listen(port,()=>{
