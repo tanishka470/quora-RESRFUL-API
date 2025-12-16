@@ -42,6 +42,16 @@ app.get('/posts',(req,res)=>{
     console.log('Request received');
     res.render("index.ejs", { posts: posts });
 });
+app.get('/posts/new',(req,res)=>{
+    
+    res.render("new.ejs", { posts: posts });
+});
+app.post('/posts',(req,res)=>{
+    let {username, content} = req.body;
+    posts.push({ username: username, content: content });
+    res.redirect('/posts');
+});
+
 app.listen(port,()=>{
     console.log(`Server is running on port ${port}`);
 });
