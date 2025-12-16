@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { v4 as uuidv4 } from 'uuid';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,15 +19,15 @@ app.set("views",path.join(__dirname,"views"));
 app.use(express.static(path.join(__dirname,"public")));
 
 let posts = [
-    { id:"1a",
+    { id:uuidv4(),
       username: "abc", 
       content: "This is the content of the first post." 
     },
-    { id:"2b",
+    { id:uuidv4(),
       username: "def",
       content: "This is the content of the second post." 
     },
-    { id:"3c",
+    { id:uuidv4(),
       username: "ghi",
       content: "This is the content of the third post." 
     }
@@ -51,15 +52,17 @@ app.get('/posts/new',(req,res)=>{
     res.render("new.ejs", { posts: posts });
 });
 app.post('/posts',(req,res)=>{
-    let {username, content} = req.body;
-    posts.push({ username: username, content: content });
-    res.redirect('/posts');
+  console.log('POST /posts received', req.body);
+  let {username, content} = req.body;
+  let newid=uuidv4();
+  posts.push({ username: username, content: content, id: newid });
+  res.redirect('/posts');
 });
 app.get('/posts/:id',(req,res)=>{
    let {id} = req.params;
    let post=posts.find((post) => post.id === id);
    console.log(post);
-   res.send("working");
+   res.render("show.ejs",{post});
 });
 
 app.listen(port,()=>{
